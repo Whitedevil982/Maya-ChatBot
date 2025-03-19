@@ -1,13 +1,10 @@
 from flask import Flask, request, jsonify
 import google.generativeai as genai
 import os
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
 
-@app.route("/")
-def home():
-    return "Maya Chatbot is running! Use the /chat endpoint to interact."
+app = Flask(__name__) 
 
-app = Flask(__name__)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 CHATBOT_NAME = "Maya"
 conversation = []
@@ -35,13 +32,21 @@ def get_gpt_response(user_input):
     
     return response.text
 
+@app.route("/")
+def home():
+    return "Maya Chatbot is running! Use the /chat endpoint to interact."
+
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    user_input = data.get("message", "")
+    user_input = data.get("message", "").strip()
+    
+    if not user_input:
+        return jsonify({"response": "Please send a message to chat."})
+    
     response = get_gpt_response(user_input)
     return jsonify({"response": response})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # Use Render's assigned port
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
