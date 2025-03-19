@@ -3,6 +3,10 @@ import google.generativeai as genai
 import os
 genai.configure(api_key="YOUR_GEMINI_API_KEY")
 
+@app.route("/")
+def home():
+    return "Maya Chatbot is running! Use the /chat endpoint to interact."
+
 app = Flask(__name__)
 
 CHATBOT_NAME = "Maya"
